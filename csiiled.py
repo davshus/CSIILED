@@ -24,7 +24,7 @@ def reload():
     led.show()
 
 def positionAt(x, y):
-    if x % 2 != 0:
-        return 252 - 18*x + y
+    if y % 2 != 0:
+        return 251 - 15*y + (17-x)
     else:
-        return 269 - 18*x - y
+        return 269 - 15*y - x
