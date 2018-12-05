@@ -1,5 +1,6 @@
 import board
 import neopixel
+import os
 
 led = neopixel.NeoPixel(board.D18, 270, auto_write = False)
 
