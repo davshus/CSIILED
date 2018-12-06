@@ -27,7 +27,7 @@ def getAnimationArray(folder):
 def displayAnimation(animation_array):
     for frame in animation_array:
         csiiled.setBoard(bmp.composite(frame))
-        time.sleep(1/30)
+        time.sleep(1/10)
 
 def getGod(name):
     m = hashlib.md5()

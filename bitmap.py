@@ -13,7 +13,7 @@ def load(path):
     print(str(bytes[22:26]))
     width = struct.unpack('I', b''.join(bytes[18:22]))[0]
     height = struct.unpack('I', b''.join(bytes[22:26]))[0]
-    image = [[(0,0,0)] * height] * width
+    image = [[(0,0,0) for i in range(height)] for j in range(width)]
     print("[BMP] Bitmap is " + str(width) + "x" + str(height))
     bpp = struct.unpack('H', b''.join(bytes[28:30]))[0]
     alpha = bpp == 32
@@ -22,10 +22,11 @@ def load(path):
     idx = offset
     for y in range(height - 1,-1,-1):
         for x in range(0,width):
+            #print(str((x,y)))
             # idx = offset + (((height - 1 - y)*width) + x) * pixel_width
             pixel_data = ()
             for i in range(0,pixel_width):
-                print(pixel_data)
+                #print(pixel_data)
                 pixel_data = pixel_data + (int.from_bytes(bytes[idx+i], byteorder=sys.byteorder, signed=False),)
                 # idx += 1
             #BGR to RGB
@@ -33,7 +34,9 @@ def load(path):
             # print("(" + str(x) + ", " + str(y) + ") " + str(pixel_data))
             # print(len(image))
             # print(len(image[0]))
-            image[x][y] = pixel_data
+            image[x][y] = tuple(i for i in pixel_data)
+            #print(pixel_data)
+            print(str((x,y)) + "\t" + str(image[3][10]))
             idx += pixel_width
     return image #bmp starts from the bottom
 
@@ -61,7 +64,7 @@ def composite(*args):
     if len(args) % 2 == 0:
         print("uh oh spaghett")
         raise ValueError("NO")
-    layers = args + (normal, [[(255, 255, 255, 255)] * len(args[0][0])] * len(args[0]))
+    layers = args + (normal, [[(255, 255, 255, 255) for i in range(len(args[0][0]))] for j in range(len(args[0]))])
     # print(layers)
     curr = layers[0][:]
     for i in range(1, len(layers), 2):
@@ -70,7 +73,7 @@ def composite(*args):
         for x in range(0, len(curr)):
             for y in range(0, len(curr[0])):
                 curr[x][y] = func(curr[x][y], dst[x][y])
-    fin = [[None] * len(curr[0])] * len(curr)
+    fin = [[None for i in range(len(curr[0]))] for j in range(len(curr))]
     for x in range(0, len(curr)):
         for y in range(0, len(curr[0])):
             # print(str(x) + ', ' + str(y))
