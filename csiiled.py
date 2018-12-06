@@ -15,12 +15,14 @@ def setPixel(x, y, color):
 
 def setBoard(newBoard):
     board = newBoard
+    print(board)
     reload()
 
 def reload():
     for x in range(0,18):
         for y in range(0,15):
             led[positionAt(x,y)] = board[x][y]
+    print(str((x,y)))
     led.show()
 
 def positionAt(x, y):
