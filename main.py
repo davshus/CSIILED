@@ -52,9 +52,43 @@ def displayAnimation(animation_array, intro=None, play_intro_frames=None):
             if i < play_intro_frame: # only play intro
                 csiiled.setBoard(bmp.composite(intro[i]))
             else if i < len(intro): #blend intro + animation
-                csiiled.setBoard(blend(intro[i], animation_array[i-play_intro_frames]))
+                csiiled.setBoard(bmp.composite(intro[i], bmp.normal(), animation_array[i-play_intro_frames]))
             else:
                 csiiled.setBoard(bmp.composite(animation_array[i-play_intro_frames]))
+
+layers = [-1, -1, 0]
+empty = [[(255,255,255) for i in range(15)] for i in range(18)]
+default = getAnimationArray("main")
+cloud = getAnimationArray("cloud")
+current = None
+def requestAnimationFrame():
+    global layers
+    global empty
+    global current
+    global default
+    global cloud
+    if layers[0] <= cloud % 2 or current is None:
+        if len(play_queue == 0):
+            layers[0] = -1
+        else:
+            current = play_queue.pop()
+            layers[0] += 1
+    else:
+        layers[1] = layers[1]+1
+    layers[2] = (layers[2] + 1) % len(default)
+    if not current is None and layers[1] >= len(current):
+        layers[1] = -1
+        layers[0] = -1
+        current = None
+        #Done playing animation
+    c = empty if layers < 0 or layers >= len(cloud) else cloud[layers[0]]
+    a = empty if current is None else current[layers[1]]
+    d = default[[layers[2]]]
+    render = bmp.composite(c, bmp.normal, a, bmp.normal, d)
+    csiiled.setBoard(render)
+    time.sleep(1/20)
+
+
 
 
 def getGod(name):
@@ -67,7 +101,8 @@ def getGod(name):
 
 if __name__ == '__main__':
     global gods
-    default = getAnimationArray("main")
+    # default = getAnimationArray("main")
+    global default
     default_length = len(default)
     # cloud = getAnimationArray("cloud")
     os.chdir("/home/pi/animations")
@@ -76,11 +111,13 @@ if __name__ == '__main__':
     animations.remove("cloud")
 
     for animation in animations:
-        gods.append(getAnimationArray(animation))
+        gods.append(getAnimationArray(animation)) #NOTE: shouldn't this be a map?
 
+    # while True:
+    #     if len(play_queue) == 0:
+    #         displayAnimation(default)
+    #     else:
+    #         next = play_queue.pop()
+    #         displayAnimation(next, intro=default, play_intro_frames=default_length/2)
     while True:
-        if len(play_queue) == 0:
-            displayAnimation(default)
-        else:
-            next = play_queue.pop()
-            displayAnimation(next, intro=default, play_intro_frames=default_length/2)
+        requestAnimationFrame()

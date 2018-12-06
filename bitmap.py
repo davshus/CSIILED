@@ -49,8 +49,8 @@ def combine_bytes(list):
     return num
 
 def normal(src, dst):
-    s = tuple(val/255 for val in src)
-    d = tuple(val/255 for val in dst)
+    s = tuple(val/255.0 for val in src)
+    d = tuple(val/255.0 for val in dst)
     out = (0,0,0,0)
     alpha = s[3] + d[3]*(1-s[3])
     # out[0] = (s[0]*s[3] + d[0]*d[3]*(1-s[3]))/alpha
