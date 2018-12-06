@@ -42,17 +42,19 @@ def blend(priority, background):
                 board = background[row][col]
 
 def displayAnimation(animation_array, intro=None, play_intro_frames=None):
+    #play_intro_frames = int(play_intro_frames)
     if intro is None:
         for frame in animation_array:
             csiiled.setBoard(bmp.composite(frame))
             time.sleep(1/10)
     else:
-        num_frames = play_intro_frames + len(animation_array)
+        play_intro_frames = int(play_intro_frames)
+        num_frames = int(play_intro_frames + len(animation_array))
         for i in range(num_frames):
-            if i < play_intro_frame: # only play intro
+            if i < play_intro_frames: # only play intro
                 csiiled.setBoard(bmp.composite(intro[i]))
-            else if i < len(intro): #blend intro + animation
-                csiiled.setBoard(bmp.composite(intro[i], bmp.normal(), animation_array[i-play_intro_frames]))
+            elif i < len(intro): #blend intro + animation
+                csiiled.setBoard(bmp.composite(intro[i], bmp.normal, animation_array[i-play_intro_frames]))
             else:
                 csiiled.setBoard(bmp.composite(animation_array[i-play_intro_frames]))
 
@@ -67,8 +69,9 @@ def requestAnimationFrame():
     global current
     global default
     global cloud
-    if layers[0] <= cloud % 2 or current is None:
-        if len(play_queue == 0):
+    #if layers[0] <= cloud % 2 or current is None:
+    if current is None:
+        if len(play_queue) == 0:
             layers[0] = -1
         else:
             current = play_queue.pop()
@@ -81,12 +84,12 @@ def requestAnimationFrame():
         layers[0] = -1
         current = None
         #Done playing animation
-    c = empty if layers < 0 or layers >= len(cloud) else cloud[layers[0]]
+    c = empty if layers[0] < 0 or layers >= len(cloud) else cloud[layers[0]]
     a = empty if current is None else current[layers[1]]
     d = default[[layers[2]]]
     render = bmp.composite(c, bmp.normal, a, bmp.normal, d)
     csiiled.setBoard(render)
-    time.sleep(1/20)
+    time.sleep(1/20.0)
 
 
 
@@ -101,23 +104,24 @@ def getGod(name):
 
 if __name__ == '__main__':
     global gods
-    # default = getAnimationArray("main")
+    default = getAnimationArray("main")
     global default
     default_length = len(default)
-    # cloud = getAnimationArray("cloud")
+    cloud = getAnimationArray("cloud")
     os.chdir("/home/pi/animations")
     animations = os.listdir()
     animations.remove("main")
     animations.remove("cloud")
-
     for animation in animations:
         gods.append(getAnimationArray(animation)) #NOTE: shouldn't this be a map?
-
-    # while True:
-    #     if len(play_queue) == 0:
-    #         displayAnimation(default)
-    #     else:
-    #         next = play_queue.pop()
-    #         displayAnimation(next, intro=default, play_intro_frames=default_length/2)
+    #play_queue.append(gods[0])
+    #play_queue.append(gods[1])
+    #play_queue.append(gods[0])
     while True:
-        requestAnimationFrame()
+         if len(play_queue) == 0:
+             displayAnimation(default)
+         else:
+             next = play_queue.pop()
+             displayAnimation(next, intro=default, play_intro_frames=default_length/2)
+    #while True:
+    #   requestAnimationFrame()
